@@ -48,7 +48,7 @@ node 'puppet.kwalinux.nl' {
       'notify yes',
     ],
   },
-}
+  }
   bind::server::file { [
     'kwalinux.nl', 'linuversity.nl', 'linuxcursus.nl', 'linuxnerd.nl', 'osgn.nl', 'reisavonturen.net', 'travelstories.net',
   ]:
