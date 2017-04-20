@@ -2,10 +2,13 @@ node 'www.kwalinux.nl' {
   include accounts
   include ssh
 
-# apache
+if ($environment == "development") {
+
+  # apache
   include apache
   include apache::mod::php
   include apache::mod::perl
+}
 
 # mobile sites
 # m.kwalinux.nl

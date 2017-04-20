@@ -7,5 +7,8 @@ if versioncmp($::puppetversion,'3.6.1') >= 0 {
   }
 }
 
-import 'nodes/www.kwalinux.nl.pp'
-import 'nodes/puppet.kwalinux.nl.pp'
+if ($environment == "development") {
+  import 'nodes/development/www.kwalinux.nl.pp'
+} else {
+  import 'nodes/production/puppet.kwalinux.nl.pp'
+}
