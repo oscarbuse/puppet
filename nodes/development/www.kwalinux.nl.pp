@@ -1,6 +1,6 @@
 node 'www.kwalinux.nl' {
   include accounts
-  include ssh
+  include ssh-oscar
 
   # apache
   include apache
@@ -90,6 +90,8 @@ node 'www.kwalinux.nl' {
     servername => 'cloud.kwalinux.nl',
     port    => '80',
     docroot => '/var/www/cloud/web-docs',
+    redirect_status => 'permanent',
+    redirect_dest   => 'https://cloud.kwalinux.nl/',
   }
 # The SSL virtual host at the same domain
   apache::vhost { 'cloud.kwalinux.nl ssl':
@@ -97,6 +99,10 @@ node 'www.kwalinux.nl' {
     port       => '443',
     docroot    => '/var/www/cloud/web-docs',
     ssl        => true,
+    ssl_cert => '/etc/letsencrypt/live/cloud.kwalinux.nl/cert.pem',
+    ssl_key => '/etc/letsencrypt/live/cloud.kwalinux.nl/privkey.pem',
+    ssl_chain => '/etc/letsencrypt/live/cloud.kwalinux.nl/chain.pem',
+    custom_fragment => 'Include /etc/letsencrypt/options-ssl-apache.conf',
   }
 
 # travelstories.net
@@ -139,38 +145,53 @@ node 'www.kwalinux.nl' {
   }
 
 # www.kwalinux.nl
-#apache::vhost { 'www.kwalinux.nl':
-#    port    => '80',
-#    docroot => '/var/www/kwalinux/web-docs',
-#    directories => [
-#        {
-#            'path' => '/var/www/kwalinux/web-docs',
-#            'options' => '-Indexes',
-#            'allow_override' => 'All',
-#        },
-#        {
-#            'path' => '/var/www/kwalinux/web-docs/cgi',
-#            'options' => 'Indexes FollowSymLinks MultiViews ExecCGI Includes',
-#            'allow_override' => 'All',
-#	    'custom_fragment' => 'AddType application/x-httpd-cgi .pl',
-#	    'custom_fragment' => 'AddHandler cgi-script .pl',
-#        },
-#        {
-#            'path' => '/var/www/kwalinux/web-docs/administratie',
-#            'options' => 'Indexes FollowSymLinks MultiViews ExecCGI Includes',
-#            'allow_override' => 'All',
-#	    'custom_fragment' => 'AddType application/x-httpd-cgi .cgi',
-#	    'custom_fragment' => 'AddHandler cgi-script .cgi',
-#        },
-#        {
-#            'path' => '/var/www/kwalinux/web-docs/view',
-#            'options' => 'Indexes FollowSymLinks MultiViews ExecCGI Includes',
-#            'allow_override' => 'All',
-#	    'custom_fragment' => 'AddType application/x-httpd-cgi .cgi',
-#	    'custom_fragment' => 'AddHandler cgi-script .cgi',
-#        },
-#    ],
-#  }
+apache::vhost { 'www.kwalinux.nl non-ssl':
+    servername => 'www.kwalinux.nl',
+    serveraliases => 'kwalinux.nl',
+    port    => '80',
+    docroot => '/var/www/kwalinux/web-docs',
+    redirect_status => 'permanent',
+    redirect_dest   => 'https://www.kwalinux.nl/',
+  }
+
+apache::vhost { 'www.kwalinux.nl ssl':
+    servername => 'www.kwalinux.nl',
+    port    => '443',
+    docroot => '/var/www/kwalinux/web-docs',
+    ssl => true,
+    ssl_cert => '/etc/letsencrypt/live/www.kwalinux.nl/cert.pem',
+    ssl_key => '/etc/letsencrypt/live/www.kwalinux.nl/privkey.pem',
+    ssl_chain => '/etc/letsencrypt/live/www.kwalinux.nl/chain.pem',
+    custom_fragment => 'Include /etc/letsencrypt/options-ssl-apache.conf',
+    directories => [
+        {
+            'path' => '/var/www/kwalinux/web-docs',
+            'options' => '-Indexes',
+            'allow_override' => 'All',
+        },
+        {
+            'path' => '/var/www/kwalinux/web-docs/cgi',
+            'options' => 'Indexes FollowSymLinks MultiViews ExecCGI Includes',
+            'allow_override' => 'All',
+	    'custom_fragment' => 'AddType application/x-httpd-cgi .pl',
+	    'custom_fragment' => 'AddHandler cgi-script .pl',
+        },
+        {
+            'path' => '/var/www/kwalinux/web-docs/administratie',
+            'options' => 'Indexes FollowSymLinks MultiViews ExecCGI Includes',
+            'allow_override' => 'All',
+	    'custom_fragment' => 'AddType application/x-httpd-cgi .cgi',
+	    'custom_fragment' => 'AddHandler cgi-script .cgi',
+        },
+        {
+            'path' => '/var/www/kwalinux/web-docs/view',
+            'options' => 'Indexes FollowSymLinks MultiViews ExecCGI Includes',
+            'allow_override' => 'All',
+            'custom_fragment' => 'AddType application/x-httpd-cgi .cgi',
+            'custom_fragment' => 'AddHandler cgi-script .cgi',
+        },
+    ],
+  }
 
 # www.all-stars.nl
 apache::vhost { 'www.all-stars.nl':
@@ -210,9 +231,24 @@ apache::vhost { 'www.all-stars.nl':
 
 # www.reisavonturen.net
 # see /etc/httpd/nopuppet
-apache::vhost { 'www.reisavonturen.net':
+apache::vhost { 'www.reisavonturen.net non-ssl':
+    servername => 'www.reisavonturen.net',
+    serveraliases => 'reisavonturen.net',
     port    => '80',
     docroot => '/var/www/reisavonturen/web-docs',
+    redirect_status => 'permanent',
+    redirect_dest   => 'https://www.reisavonturen.net/',
+  }
+
+apache::vhost { 'www.reisavonturen.net ssl':
+    servername => 'www.reisavonturen.net',
+    port    => '443',
+    docroot => '/var/www/reisavonturen/web-docs',
+    ssl => true,
+    ssl_cert => '/etc/letsencrypt/live/www.reisavonturen.net/cert.pem',
+    ssl_key => '/etc/letsencrypt/live/www.reisavonturen.net/privkey.pem',
+    ssl_chain => '/etc/letsencrypt/live/www.reisavonturen.net/chain.pem',
+    custom_fragment => 'Include /etc/letsencrypt/options-ssl-apache.conf',
     directories => [
         {
             'path' => '/var/www/reisavonturen/web-docs',
@@ -229,21 +265,22 @@ apache::vhost { 'www.reisavonturen.net':
         },
     ],
     aliases => [
-        { 
-	    alias => '/css',
+        {
+            alias => '/css',
             path => '/var/www/reisavonturen/css',
         },
     ],
     scriptaliases => [
-        { 
-	    alias => '/cgi-bin/',
+        {
+             alias => '/cgi-bin/',
             path => '/var/www/reisavonturen/cgi-bin/',
         },
     ],
   }
 
-# gallery.reisavonturen.net
-# see /etc/httpd/nopuppet
+
+## gallery.reisavonturen.net
+## see /etc/httpd/nopuppet
 #apache::vhost { 'gallery.reisavonturen.net':
 #   port    => '80',
 #    docroot => '/var/www/reisavonturen/web-docs/fotogallery',

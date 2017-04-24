@@ -1,6 +1,6 @@
 node 'puppet.kwalinux.nl' {
   include accounts
-  include ssh
+  include ssh-oscar
 
   # named
   class { '::bind': chroot => true }
