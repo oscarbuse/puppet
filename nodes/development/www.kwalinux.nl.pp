@@ -211,6 +211,12 @@ apache::vhost { 'www.all-stars.nl':
 	    'custom_fragment' => 'AddType application/x-httpd-cgi .pl',
         },
     ],
+    scriptaliases => [
+        {
+            alias => '/star-bin/',
+            path => '/var/www/all-stars/star-bin/',
+        },
+    ],
   }
 
 # merle.all-stars.nl
@@ -263,6 +269,13 @@ apache::vhost { 'www.reisavonturen.net ssl':
             'custom_fragment' => 'SetHandler perl-script',
             'custom_fragment' => 'PerlResponseHandler ModPerl::Registry',
         },
+        {
+            'path' => '/var/www/reisavonturen/web-docs/zoek',
+            'options' => 'Indexes FollowSymLinks ExecCGI Includes',
+            'allow_override' => 'All',
+            # RewriteRule ^(.*)$ http://127.0.0.1:9200/$1 [P]
+	    rewrites => [ { rewrite_rule => ['^(.*)$ http://127.0.0.1:9200/$1 [P]'] } ]
+        },
     ],
     aliases => [
         {
@@ -275,6 +288,9 @@ apache::vhost { 'www.reisavonturen.net ssl':
              alias => '/cgi-bin/',
             path => '/var/www/reisavonturen/cgi-bin/',
         },
+    ],
+    proxy_pass => [
+      { 'path' => '/undef', 'url' => 'http://www.reisavonturen.net/cgi-bin/404.cgi' },
     ],
   }
 
